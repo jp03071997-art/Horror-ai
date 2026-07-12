@@ -13,11 +13,11 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-r1-0528:free",
+        model: "google/gemma-3-4b-it:free",
         messages: [
           {
             role: "user",
-            content: "Create a cinematic horror video prompt in Hindi: " + prompt
+            content: prompt
           }
         ]
       })
@@ -25,11 +25,21 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
+    console.log(data);
+
+    if (data.error) {
+      return res.status(400).json({
+        error: data.error.message
+      });
+    }
+
     res.status(200).json({
-      text: data.choices?.[0]?.message?.content || data.error?.message || "No response"
+      text: data.choices?.[0]?.message?.content || "No response"
     });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      error: err.message
+    });
   }
 }
